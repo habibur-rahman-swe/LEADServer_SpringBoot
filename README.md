@@ -13,5 +13,8 @@ Docker compose
     volumes:
       - './openldap_data:/bitnami/openldap'
 ```
+
 dn: `dc=example,dc=org`
+
+
 bindDn: `"cn=admin,dc=example,dc=org"`
