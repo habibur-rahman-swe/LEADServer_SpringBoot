@@ -12,39 +12,23 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class DemoApplication implements CommandLineRunner {
 
 	@Autowired
-    private LdapService ldapService;
+	private LdapService ldapService;
 
-    public static void main(String[] args) {
-        SpringApplication.run(DemoApplication.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(DemoApplication.class, args);
+	}
+	
 
-    @Override
-    public void run(String... args) throws Exception {
-        LdapConnectionParameters connectionParams = new LdapConnectionParameters();
-        connectionParams.setHostname("localhost");
-        connectionParams.setPort(1389);
-        connectionParams.setConnectionTimeout(5);
+	@Override
+	public void run(String... args) throws Exception {
 
-        LdapAuthenticationParameters authParams = new LdapAuthenticationParameters();
-        authParams.setBindDn("cn=admin,dc=example,dc=org");
-        authParams.setPassword("admin123");
+		String bindDn = "cn=admin,dc=example,dc=org";
+		String password = "admin123";
 
-        if (ldapService.checkNetworkParameters(connectionParams)) {
-            System.out.println("Network parameters are valid.");
-            
-            if (ldapService.authenticate(connectionParams, authParams)) {
-                System.out.println("Authentication successful.");
-                
-                Map<String, List<String>> baseDNs = ldapService.printBaseDNs(authParams);
-                baseDNs.keySet().forEach(key -> {
-                	System.out.println(key + " : " + baseDNs.get(key));
-                });
-                
-            } else {
-                System.out.println("Authentication failed.");
-            }
-        } else {
-            System.out.println("Network parameters are invalid.");
-        }
-    }
+		System.out.println("Authenticate: " + ldapService.LdapAuthenticate(bindDn, password));
+		Map<String, List<String>> cnsList = ldapService.getBaseCNs(bindDn, password);
+		cnsList.keySet().forEach(key -> {
+			System.out.println(key + " : " + cnsList.get(key));
+		});
+	}
 }
