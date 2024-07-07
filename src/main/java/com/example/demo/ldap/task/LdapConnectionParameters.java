@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.demo.ldap.task;
 
 public class LdapConnectionParameters {
     private String connectionName;

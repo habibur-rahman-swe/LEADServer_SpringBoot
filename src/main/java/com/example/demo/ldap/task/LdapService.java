@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.demo.ldap.task;
 
 import java.util.List;
 import java.util.Map;

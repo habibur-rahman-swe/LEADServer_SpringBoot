@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.demo.ldap.task;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
