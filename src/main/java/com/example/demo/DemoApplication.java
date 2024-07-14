@@ -14,12 +14,22 @@ public class DemoApplication implements CommandLineRunner {
 	@Autowired
     private LdapService ldapService;
 
+	@Autowired
+	private LdapConfig ldapConfig;
+	
     public static void main(String[] args) {
         SpringApplication.run(DemoApplication.class, args);
     }
 
     @Override
     public void run(String... args) throws Exception {
+    	
+    	try {
+    		System.out.println(ldapConfig.configureLdap());
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    	}
+    	
         LdapConnectionParameters connectionParams = new LdapConnectionParameters();
         connectionParams.setHostname("localhost");
         connectionParams.setPort(1389);
