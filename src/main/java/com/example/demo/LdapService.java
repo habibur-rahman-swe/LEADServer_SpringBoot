@@ -1,10 +1,14 @@
 package com.example.demo;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.security.MessageDigest;
+import java.util.Base64;
 
 import javax.naming.directory.DirContext;
 import javax.naming.directory.SearchControls;
@@ -88,7 +92,13 @@ public class LdapService {
                     	if (attr.getID().compareTo("mail") == 0) {
                         	mails.add(value);
                         }
-                    	
+
+                    	if (attr.getID().compareTo("userPassword") == 0) {
+                            System.out.println(attr.getID() + " : " + value);
+                            if (checkPassword(value, "password1")) {
+                                System.out.println("Hello! I'm the password....");
+                            }
+                        }
                     	// results.add("Value: " + value);
                     }
                 }
@@ -99,5 +109,64 @@ public class LdapService {
             e.printStackTrace();
         }
         return tResult;
+    }
+
+    public boolean checkPassword(String ldapPass, String givenPass) {
+        try {
+            // Decode the Base64 encoded LDAP password
+            byte[] storedPassword = decodeBase64(ldapPass);
+            System.out.println("Decoded LDAP Password (byte array): " + Arrays.toString(storedPassword));
+
+            // Extract the salt and stored hash
+            byte[] salt = Arrays.copyOfRange(storedPassword, 0, 8);
+            byte[] storedHash = Arrays.copyOfRange(storedPassword, 8, storedPassword.length);
+
+            // Print salt and hash for debugging
+            System.out.println("Salt: " + Arrays.toString(salt));
+            System.out.println("Stored Hash: " + Arrays.toString(storedHash));
+
+            // Generate the hash for the given password with the extracted salt
+            byte[] givenHash = hashPassword(givenPass, salt);
+
+            // Compare the generated hash with the stored hash
+            return Arrays.equals(storedHash, givenHash);
+        } catch (IllegalArgumentException e) {
+            System.err.println("Error decoding Base64 or processing password: " + e.getMessage());
+            return false;
+        }
+    }
+
+    private byte[] decodeBase64(String base64String) {
+        try {
+            return Base64.getDecoder().decode(base64String);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid Base64 input: " + base64String, e);
+        }
+    }
+
+    private byte[] hashPassword(String password, byte[] salt) {
+        try {
+            // Create a MessageDigest instance for SHA-1
+            MessageDigest md = MessageDigest.getInstance("SHA-1");
+
+            // Add the salt to the digest
+            md.update(salt);
+
+            // Add the password to the digest
+            md.update(password.getBytes());
+
+            // Compute the hash
+            byte[] hashedPassword = md.digest();
+
+            // Combine salt and hash for final result
+            byte[] saltAndHash = new byte[salt.length + hashedPassword.length];
+            System.arraycopy(salt, 0, saltAndHash, 0, salt.length);
+            System.arraycopy(hashedPassword, 0, saltAndHash, salt.length, hashedPassword.length);
+
+            // Return the combined result
+            return saltAndHash;
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Error hashing password", e);
+        }
     }
 }

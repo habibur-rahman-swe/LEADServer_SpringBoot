@@ -36,8 +36,9 @@ public class DemoApplication implements CommandLineRunner {
         connectionParams.setConnectionTimeout(5);
 
         LdapAuthenticationParameters authParams = new LdapAuthenticationParameters();
-        authParams.setBindDn("cn=admin,dc=example,dc=org");
-        authParams.setPassword("admin123");
+        //authParams.setBindDn("cn=admin,dc=example,dc=org");
+        authParams.setBindDn("cn=user1,ou=users,dc=example,dc=org");
+        authParams.setPassword("password1");
 
         if (ldapService.checkNetworkParameters(connectionParams)) {
             System.out.println("Network parameters are valid.");
